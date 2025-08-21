@@ -6,15 +6,19 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 public class FrmDevuelta extends JFrame {
 
     // variables globales
     private int[] denominacion = new int[] { 100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50 };
     private int[] existencia = new int[denominacion.length];
+    private String[] encabezados = new String[] { "Cantidad", "Presentación", "Denominación" };
     private JComboBox cmbDenominacion;
-    private JTextField txtExistencia;
+    private JTextField txtExistencia, txtDevuelta;
 
     // metodo constructor
     public FrmDevuelta() {
@@ -68,6 +72,29 @@ public class FrmDevuelta extends JFrame {
 
         });
 
+        // Agregar elementos para leer el valor a devolver
+        JLabel lblDevuelta = new JLabel("Valor a devolver:");
+        lblDevuelta.setBounds(10, 70, 100, 25);
+        getContentPane().add(lblDevuelta);
+
+        txtDevuelta = new JTextField();
+        txtDevuelta.setBounds(150, 70, 100, 25);
+        getContentPane().add(txtDevuelta);
+
+        JButton btnDevuelta = new JButton("Calcular");
+        btnDevuelta.setBounds(260, 70, 100, 25);
+        getContentPane().add(btnDevuelta);
+
+        // Agregar rejilla de datos
+        JTable tblDevuelta = new JTable();
+        JScrollPane spDevuelta = new JScrollPane(tblDevuelta);
+        spDevuelta.setBounds(10, 100, 450, 200);
+        getContentPane().add(spDevuelta);
+
+        // Asignar el modelo de datos de la rejilla
+        DefaultTableModel dtm = new DefaultTableModel(null, encabezados);
+        tblDevuelta.setModel(dtm);
+
     }
 
     private void consultarExistencia() {
@@ -76,7 +103,8 @@ public class FrmDevuelta extends JFrame {
     }
 
     private void actualizarExistencia() {
-
+        int existenciaActual = Integer.parseInt(txtExistencia.getText());
+        existencia[cmbDenominacion.getSelectedIndex()] = existenciaActual;
     }
 
 }
