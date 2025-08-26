@@ -6,6 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -19,6 +20,7 @@ public class FrmDevuelta extends JFrame {
     private String[] encabezados = new String[] { "Cantidad", "Presentación", "Denominación" };
     private JComboBox cmbDenominacion;
     private JTextField txtExistencia, txtDevuelta;
+    private JTable tblDevuelta;
 
     // metodo constructor
     public FrmDevuelta() {
@@ -86,7 +88,7 @@ public class FrmDevuelta extends JFrame {
         getContentPane().add(btnDevuelta);
 
         // Agregar rejilla de datos
-        JTable tblDevuelta = new JTable();
+        tblDevuelta = new JTable();
         JScrollPane spDevuelta = new JScrollPane(tblDevuelta);
         spDevuelta.setBounds(10, 100, 450, 200);
         getContentPane().add(spDevuelta);
@@ -94,6 +96,16 @@ public class FrmDevuelta extends JFrame {
         // Asignar el modelo de datos de la rejilla
         DefaultTableModel dtm = new DefaultTableModel(null, encabezados);
         tblDevuelta.setModel(dtm);
+
+        // Agregar el evento para calcular la devuelta
+        btnDevuelta.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                calcularDevuelta();
+            }
+
+        });
 
     }
 
@@ -105,6 +117,51 @@ public class FrmDevuelta extends JFrame {
     private void actualizarExistencia() {
         int existenciaActual = Integer.parseInt(txtExistencia.getText());
         existencia[cmbDenominacion.getSelectedIndex()] = existenciaActual;
+    }
+
+    private void calcularDevuelta() {
+
+        int[] devuelta = new int[denominacion.length];
+
+        int valorDevuelta = Integer.parseInt(txtDevuelta.getText());
+        int i = 0;
+        int totalFilas = 0;
+        while (valorDevuelta > 0 && i < denominacion.length) {
+            if (valorDevuelta > denominacion[i]) {
+                int cantidadNecesaria = (int) (valorDevuelta / denominacion[i]);
+                devuelta[i] = existencia[i] >= cantidadNecesaria ? cantidadNecesaria : existencia[i];
+                // if (existencia[i] >= cantidadNecesaria) {
+                // devuelta[i] = cantidadNecesaria;
+                // } else {
+                // devuelta[i] = existencia[i];
+                // }
+                if (devuelta[i] > 0) {
+                    valorDevuelta -= denominacion[i] * devuelta[i];
+                    totalFilas++;
+                }
+            }
+            i++;
+        }
+
+        String[][] datos = new String[totalFilas][encabezados.length];
+        totalFilas = 0;
+        for (i = 0; i < devuelta.length; i++) {
+            if (devuelta[i] > 0) {
+                datos[totalFilas][0] = String.valueOf(devuelta[i]);
+                datos[totalFilas][1] = denominacion[i] <= 1000 ? "moneda" : "billete";
+                datos[totalFilas][2] =  String.valueOf(denominacion[i]);
+                totalFilas++;
+            }
+        }
+
+         // Asignar el modelo de datos de la rejilla
+        DefaultTableModel dtm = new DefaultTableModel(datos, encabezados);
+        tblDevuelta.setModel(dtm);
+
+        if(valorDevuelta>0){
+            JOptionPane.showMessageDialog(null, "Queda pendiente $ "+valorDevuelta + " por devolver");
+        }
+
     }
 
 }
